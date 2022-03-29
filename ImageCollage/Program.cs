@@ -61,38 +61,28 @@ namespace ImageCollage
             }
             IMGURLS.Clear();
             Console.WriteLine("Done Getting Images");
-
-            Console.SetCursorPosition(0, Console.CursorTop + 1);
-            Console.Write("Choose percent of largest image width (1-100): ");
+            Console.Write("\nChoose percent of largest image width (1-100): ");
             Percent = float.Parse(Console.ReadLine()) / 100;
 
-
             //Naive/Simple Decreasing height packing
-            //get width of all images
-            int MaxWidth = GetRowWidth(imgInfo);
-
-            //set new maxwidth depending on percent chosen
-            MaxWidth = (int)(MaxWidth * Percent);
-
+            //determine max width of final image
+            int MaxWidth = (int)(GetRowWidth(imgInfo) * Percent);
 
             List<ImageInfo> HeightSortedImages = new List<ImageInfo>();
             while (imgInfo.Count > 0)
             {
-                ImageInfo TallestImage = new ImageInfo();
                 int ImageIndex = 0;
                 for (int i = 0; i < imgInfo.Count; i++)
                 {
-                    if (imgInfo[i].Height > TallestImage.Height) { TallestImage = imgInfo[i]; ImageIndex = i; }
+                    if (imgInfo[i].Height > imgInfo[ImageIndex].Height) { imgInfo[ImageIndex] = imgInfo[i]; ImageIndex = i; }
                 }
-                HeightSortedImages.Add(TallestImage);
+                HeightSortedImages.Add(imgInfo[ImageIndex]);
                 imgInfo.RemoveAt(ImageIndex);
             }
-
 
             List<List<ImageInfo>> PackedImages = new List<List<ImageInfo>>();
             //Add first level
             PackedImages.Add(new List<ImageInfo>());
-
             while (HeightSortedImages.Count > 0)
             {
                 bool ImagePacked = false;
@@ -142,7 +132,6 @@ namespace ImageCollage
                 FinImgHeight += PackedImages[i][0].Height;
             }
 
-
             //Construct the final image
             var finalImg = new Bitmap(FinImgWidth, FinImgHeight);
             using (var g = Graphics.FromImage(finalImg))
@@ -157,14 +146,11 @@ namespace ImageCollage
                 }
             }
 
-
-            Console.SetCursorPosition(0, Console.CursorTop + 2);
-            Console.Write("Input SaveName: ");
+            Console.Write("\nInput SaveName: ");
             SaveFileName = Console.ReadLine();
             SaveFileName = SaveFileName.Replace("\"", "");
 
-
-            finalImg.Save(SaveFileName + ".jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+            finalImg.Save(SaveFileName + ".png", System.Drawing.Imaging.ImageFormat.Png);
             finalImg.Dispose();
         }
 
